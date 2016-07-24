@@ -1,0 +1,25 @@
+vault:
+#  image: cgswong/vault:latest
+  image: sjourdan/vault
+  ports:
+    - '8200:9000'
+  expose:
+    - 9000
+  environment:
+    # Necessary for the vault client
+    - VAULT_ADDR=http://127.0.0.1:8200
+  volumes:
+    - ./docker_vault/logs:/root/logs
+    - ./docker_vault/conf/vault.conf:/root/vault.conf
+    - ./docker_vault/myapp.hcl:/root/myapp.hcl
+  command: ['server', '-config', '/root/vault.conf', '-dev']
+
+# quote-service:
+#   build: ./microservices/core/quote-service/.
+#   hostname: quote-service
+#   volumes:
+#     - /etc/localtime:/etc/localtime:ro
+#     - /etc/timezone:/etc/timezone:ro
+#     - ./microservices/core/quote-service:/build
+#   ports:
+#     - "4567:4567"
