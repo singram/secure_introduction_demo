@@ -48,31 +48,23 @@ Execute the following to run the services.
 
     ./ms build
 
-#### Gradle daemon
-
-To accelerate local development, it is recommended to run gradle daemonized.  This is as simple as running the following
-
-    echo "org.gradle.daemon=true" >> ~/.gradle/gradle.properties
-
 ### To run
 
     ./ms run_vault
 
 ## Overview
 
-./vault audit-enable file path=/root/logs/audit.log
+    ./vault audit-enable file path=/root/logs/audit.log
+    ./vault policy-write myapp /root/myapp.hcl
+    ./vault write secret/myapp/awesome value="sauce"
+    ./vault write secret/otherapp/awesome value="pandas"
 
-./vault policy-write myapp /root/myapp.hcl
-./vault write secret/myapp/awesome value="sauce"
-./vault write secret/otherapp/awesome value="pandas"
+Change authentication token
 
-# Change authentication token
-
-./vault token-create -policy=myapp -wrap-ttl-60
-
-./vault auth cc9a61f9-0c40-27ff-74aa-5a082c4d269f
-./vault read secret/myapp/awesome
-./vault write secret/myapp/awesome value="hashicorp"
+    ./vault token-create -policy=myapp -wrap-ttl-60
+    ./vault auth cc9a61f9-0c40-27ff-74aa-5a082c4d269f
+    ./vault read secret/myapp/awesome
+    ./vault write secret/myapp/awesome value="hashicorp"
 
 ## References
 
