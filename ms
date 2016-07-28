@@ -58,6 +58,10 @@ case $CMD in
         echo "Starting services for docker probes..."
         exec docker-compose -f docker-compose-probes.yml up
         ;;
+    "run_app")
+        echo "Starting services ..."
+        exec docker-compose -f docker-compose.yml -f docker-compose-app.yml up
+        ;;
     "run_vault")
         echo "Starting services ..."
         exec docker-compose up

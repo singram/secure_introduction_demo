@@ -1,4 +1,7 @@
 source 'https://rubygems.org'
 
+gem 'mysql2'
+gem 'rufus-scheduler'
 gem 'sinatra'
-gem "vault", "~> 0.1"
+#gem "vault", "~> 0.1"
+gem 'vault', :git => 'https://github.com/singram/vault-ruby.git', :branch => 'added_support_for_response_wrapping_and_unwrapping'

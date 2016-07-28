@@ -1,22 +1,32 @@
+GIT
+  remote: https://github.com/singram/vault-ruby.git
+  revision: 447fcb32f9a0331d6856753183219576010d5782
+  branch: added_support_for_response_wrapping_and_unwrapping
+  specs:
+    vault (0.4.0.dev)
+
 GEM
   remote: https://rubygems.org/
   specs:
+    mysql2 (0.4.4)
     rack (1.6.4)
     rack-protection (1.5.3)
       rack
+    rufus-scheduler (3.2.1)
     sinatra (1.4.7)
       rack (~> 1.5)
       rack-protection (~> 1.4)
       tilt (>= 1.3, < 3)
     tilt (2.0.4)
-    vault (0.4.0)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
+  mysql2
+  rufus-scheduler
   sinatra
-  vault (~> 0.1)
+  vault!
 
 BUNDLED WITH
    1.11.2

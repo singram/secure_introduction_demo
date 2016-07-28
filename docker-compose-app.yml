@@ -1,0 +1,14 @@
+simple-service:
+  build: ./simple-service/.
+  hostname: simple-service
+  volumes:
+    - /etc/localtime:/etc/localtime:ro
+    - /etc/timezone:/etc/timezone:ro
+    - ./simple-service:/build
+  links:
+    - mysql
+    - vault
+  environment:
+    - VAULT_SI_TOKEN=${VAULT_SI_TOKEN}
+  ports:
+    - "4567:4567"

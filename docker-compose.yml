@@ -1,25 +1,43 @@
 vault:
-#  image: cgswong/vault:latest
-  image: sjourdan/vault
+  image: vault
   ports:
     - '8200:9000'
   expose:
     - 9000
+  links:
+    - mysql
   environment:
     # Necessary for the vault client
-    - VAULT_ADDR=http://127.0.0.1:8200
+#    - VAULT_ADDR=http://127.0.0.1:8200
+    - VAULT_ADDR=http://172.17.0.1:8201
   volumes:
     - ./docker_vault/logs:/root/logs
     - ./docker_vault/conf/vault.conf:/root/vault.conf
     - ./docker_vault/myapp.hcl:/root/myapp.hcl
   command: ['server', '-config', '/root/vault.conf', '-dev']
 
-# quote-service:
-#   build: ./microservices/core/quote-service/.
-#   hostname: quote-service
+mysql:
+  image: mysql:5.7
+  volumes:
+    - /etc/localtime:/etc/localtime:ro
+    - /etc/timezone:/etc/timezone:ro
+  environment:
+    MYSQL_ROOT_PASSWORD: rootpassword
+    MYSQL_DATABASE: test
+    MYSQL_USER: myuser
+    MYSQL_PASSWORD: mypass
+  ports:
+    - "3306:3306"
+
+
+# vaultclient:
+#   image: vault
+#   links:
+#     - vault
+#   environment:
+#     # Necessary for the vault client.
+#     - VAULT_ADDR=http://172.17.0.1:8201
 #   volumes:
-#     - /etc/localtime:/etc/localtime:ro
-#     - /etc/timezone:/etc/timezone:ro
-#     - ./microservices/core/quote-service:/build
-#   ports:
-#     - "4567:4567"
+#     - ./docker_vault/conf/vault.conf:/root/vault.conf
+#     - ./docker_vault/myapp.hcl:/root/myapp.hcl
+#   entrypoint: ['tail', '-f', '/dev/null' ]

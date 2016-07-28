@@ -40,13 +40,7 @@ To install the 1.6.0:
 
 Install supporting tools
 
-    sudo apt-get install jq
-
-### To build
-
-Execute the following to run the services.
-
-    ./ms build
+    sudo apt-get install jq mitmproxy wget libmysqlclient-dev
 
 ### To run
 
@@ -56,15 +50,26 @@ Execute the following to run the services.
 
     ./vault audit-enable file path=/root/logs/audit.log
     ./vault policy-write myapp /root/myapp.hcl
+
     ./vault write secret/myapp/awesome value="sauce"
+    ./vault write secret/myapp/db host="mysql" port=3306
     ./vault write secret/otherapp/awesome value="pandas"
 
-Change authentication token
-
-    ./vault token-create -policy=myapp -wrap-ttl-60
+    ./vault token-create -display-name=myapp -policy=myapp -wrap-ttl=120
+    ./vault unwrap 179a661c-bda2-c382-44df-b8ef0031e378
     ./vault auth cc9a61f9-0c40-27ff-74aa-5a082c4d269f
     ./vault read secret/myapp/awesome
+    ./vault read secret/otherapp/awesome
     ./vault write secret/myapp/awesome value="hashicorp"
+    ./vault token-lookup 7e8d90cf-19b5-6c6f-9357-26a36b952b29
+
+    ./vault mount mysql
+    ./vault write mysql/config/connection connection_url="root:rootpassword@tcp(mysql:3306)/"
+    ./vault write mysql/config/lease lease=1h lease_max=24h
+    ./vault write mysql/roles/readonly \
+       sql="CREATE USER '{{name}}'@'%' IDENTIFIED BY '{{password}}';GRANT SELECT ON *.* TO '{{name}}'@'%';"
+    ./vault list /mysql/roles
+    ./vault read mysql/creds/readonly
 
 ## References
 
@@ -77,6 +82,7 @@ Change authentication token
 ### Vault
 - https://www.hashicorp.com/blog/vault-0.6.html
 - https://www.amon.cx/blog/managing-all-secrets-with-vault/
+- http://blogs.cisco.com/cloud/mantl-knows-secrets
 
 #### PKI
 - http://cuddletech.com/?p=959
@@ -84,3 +90,6 @@ Change authentication token
 
 #### Dynamic user creation
 - https://www.pythian.com/blog/dynamic-mysql-credentials-vault/
+
+#### HTTP Interception in lieu of documentation
+- http://unix.stackexchange.com/questions/103037/what-tool-can-i-use-to-sniff-http-https-traffic

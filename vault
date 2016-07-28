@@ -1,4 +1,5 @@
 #!/bin/bash
 
-export VAULT_ADDR='http://127.0.0.1:8200'
+#export VAULT_ADDR='http://127.0.0.1:8200'
+export VAULT_ADDR='http://172.17.0.1:8201'
 docker exec -it secureintroductiondemo_vault_1 vault "$@"
