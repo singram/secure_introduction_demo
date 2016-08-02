@@ -1,0 +1,13 @@
+mitmproxy -P http://127.0.0.1:8200 -p 8201 -vv
+
+./initialize_vault
+cd simple-service
+cd .. && WRAPPED_TOKEN=`./vault token-create -format=json -display-name=myapp -policy=myapp -wrap-ttl=120 | jq -c . | sed -e '#\n##'` && cd -
+echo $WRAPPED_TOKEN
+VAULT_SI_TOKEN=$WRAPPED_TOKEN bundle exec ruby app/simple_server.rb
+
+watch 'mysql -u root -prootpassword -h 127.0.0.1 -e "SELECT User FROM mysql.user"'
+
+
+# Fixed in Vault 0.6.1
+cd .. && WRAPPED_TOKEN=`./vault token-create -format=json -display-name=myapp -policy=myapp -wrap-ttl=120 -ttl=90 -explicit-max-ttl=180 | jq -c . | sed -e '#\n##'` && cd -

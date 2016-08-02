@@ -6,6 +6,15 @@ path "auth/token/create*" {
   policy = "write"
 }
 
+path "auth/token/create-orphan*" {
+  policy = "write"
+}
+
+path "auth/token/renew/mysql/creds/readonly/*" {
+  policy = "write"
+}
+
+
 path "mysql/creds/readonly" {
   policy = "read"
 }

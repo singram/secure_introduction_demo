@@ -48,6 +48,10 @@ Install supporting tools
 
 ## Overview
 
+Illustration of issues with environment variables
+
+    docker exec secureintroductiondemo_mysql_1 env | grep -i password
+
     ./vault audit-enable file path=/root/logs/audit.log
     ./vault policy-write myapp /root/myapp.hcl
 
@@ -70,6 +74,8 @@ Install supporting tools
        sql="CREATE USER '{{name}}'@'%' IDENTIFIED BY '{{password}}';GRANT SELECT ON *.* TO '{{name}}'@'%';"
     ./vault list /mysql/roles
     ./vault read mysql/creds/readonly
+
+
 
 ## References
 
