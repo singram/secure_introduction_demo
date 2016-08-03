@@ -44,13 +44,19 @@ Install supporting tools
 
 ### To run
 
-    ./ms run_vault
+Shell 1
+
+    docker-compose up
+
+Shell 2
+
+    mitmproxy -P http://127.0.0.1:8200 -p 8201 -vv
+
+Shell 3
+
+    ./initialize_vault
 
 ## Overview
-
-Illustration of issues with environment variables
-
-    docker exec secureintroductiondemo_mysql_1 env | grep -i password
 
     ./vault audit-enable file path=/root/logs/audit.log
     ./vault policy-write myapp /root/myapp.hcl
@@ -74,8 +80,6 @@ Illustration of issues with environment variables
        sql="CREATE USER '{{name}}'@'%' IDENTIFIED BY '{{password}}';GRANT SELECT ON *.* TO '{{name}}'@'%';"
     ./vault list /mysql/roles
     ./vault read mysql/creds/readonly
-
-
 
 ## References
 

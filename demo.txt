@@ -1,13 +1,55 @@
+docker-compose up
 mitmproxy -P http://127.0.0.1:8200 -p 8201 -vv
 
 ./initialize_vault
+
+docker exec secureintroductiondemo_mysql_1 env | grep -i password
+
+./vault write secret/myapp/data awesome="sauce"
+./vault write secret/otherapp/data animal="pandas" color="black & white"  status="awesome"
+./vault read secret/otherapp/data
+./vault token-create -format=json -display-name=myapp -policy=myapp-wrap-ttl=120
+./vault unwrap xx
+./vault auth
+./vault read secret/otherapp/data
+./vault read secret/myapp/data
+./vault write secret/myapp/moredata this="better not work"
+./vault token-lookup xx
+./vault status
+
+./vault list /mysql/roles
+./vault read mysql/creds/readonly
+mysql -u root -prootpassword -h 127.0.0.1 -e "SELECT User FROM mysql.user"
+mysql -u token-myap-419b7 -p959edba3-bcf2-111c-22ce-cd56b55eb48f -h 127.0.0.1
+./vault revoke xxx
+mysql -u root -prootpassword -h 127.0.0.1 -e "SELECT User FROM mysql.user"
+mysql -u root -prootpassword -h 127.0.0.1 -e "SHOW PROCESSLIST"
+
+
+sudo less docker_vault/logs/audit.log
+
+
+
 cd simple-service
+
+cd .. && WRAPPED_TOKEN=`./vault token-create -format=json -display-name=myapp -policy=myapp -wrap-ttl=10 | jq -c . | sed -e '#\n##'` && cd -
+echo $WRAPPED_TOKEN
+VAULT_SI_TOKEN=$WRAPPED_TOKEN bundle exec ruby app/simple_server.rb
+
+cd .. && WRAPPED_TOKEN=`./vault token-create -format=json -display-name=myapp -policy=myapp -wrap-ttl=120 | jq -c . | sed -e '#\n##'` && cd -
+echo $WRAPPED_TOKEN
+cd .. && ./vault unwrap xxx && cd -
+VAULT_SI_TOKEN=$WRAPPED_TOKEN bundle exec ruby app/simple_server.rb
+
 cd .. && WRAPPED_TOKEN=`./vault token-create -format=json -display-name=myapp -policy=myapp -wrap-ttl=120 | jq -c . | sed -e '#\n##'` && cd -
 echo $WRAPPED_TOKEN
 VAULT_SI_TOKEN=$WRAPPED_TOKEN bundle exec ruby app/simple_server.rb
 
-watch 'mysql -u root -prootpassword -h 127.0.0.1 -e "SELECT User FROM mysql.user"'
+curl localhost:4567/
+curl localhost:4567/renew
+curl localhost:4567/rotate
 
+watch 'mysql -u root -prootpassword -h 127.0.0.1 -e "SELECT User FROM mysql.user"'
 
 # Fixed in Vault 0.6.1
 cd .. && WRAPPED_TOKEN=`./vault token-create -format=json -display-name=myapp -policy=myapp -wrap-ttl=120 -ttl=90 -explicit-max-ttl=180 | jq -c . | sed -e '#\n##'` && cd -
