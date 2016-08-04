@@ -10,7 +10,7 @@ path "auth/token/create-orphan*" {
   policy = "write"
 }
 
-path "auth/token/renew/mysql/creds/readonly/*" {
+path "sys/renew/mysql/creds/readonly/*" {
   policy = "write"
 }
 

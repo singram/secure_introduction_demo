@@ -8,19 +8,22 @@ docker exec secureintroductiondemo_mysql_1 env | grep -i password
 ./vault write secret/myapp/data awesome="sauce"
 ./vault write secret/otherapp/data animal="pandas" color="black & white"  status="awesome"
 ./vault read secret/otherapp/data
-./vault token-create -format=json -display-name=myapp -policy=myapp-wrap-ttl=120
+./vault read -format json secret/otherapp/data
+cat docker_vault/myapp.hcl
+./vault token-create -format=json -display-name=myapp -policy=myapp -wrap-ttl=120
 ./vault unwrap xx
 ./vault auth
 ./vault read secret/otherapp/data
 ./vault read secret/myapp/data
 ./vault write secret/myapp/moredata this="better not work"
-./vault token-lookup xx
 ./vault status
 
+./vault auth back to root
 ./vault list /mysql/roles
 ./vault read mysql/creds/readonly
 mysql -u root -prootpassword -h 127.0.0.1 -e "SELECT User FROM mysql.user"
 mysql -u token-myap-419b7 -p959edba3-bcf2-111c-22ce-cd56b55eb48f -h 127.0.0.1
+./vault auth *root*
 ./vault revoke xxx
 mysql -u root -prootpassword -h 127.0.0.1 -e "SELECT User FROM mysql.user"
 mysql -u root -prootpassword -h 127.0.0.1 -e "SHOW PROCESSLIST"
@@ -44,6 +47,8 @@ VAULT_SI_TOKEN=$WRAPPED_TOKEN bundle exec ruby app/simple_server.rb
 cd .. && WRAPPED_TOKEN=`./vault token-create -format=json -display-name=myapp -policy=myapp -wrap-ttl=120 | jq -c . | sed -e '#\n##'` && cd -
 echo $WRAPPED_TOKEN
 VAULT_SI_TOKEN=$WRAPPED_TOKEN bundle exec ruby app/simple_server.rb
+
+mysql -u root -prootpassword -h 127.0.0.1 -e "SELECT User FROM mysql.user; SHOW PROCESSLIST;"
 
 curl localhost:4567/
 curl localhost:4567/renew
