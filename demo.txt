@@ -3,36 +3,69 @@ mitmproxy -P http://127.0.0.1:8200 -p 8201 -vv
 
 ./initialize_vault
 
-docker exec secureintroductiondemo_mysql_1 env | grep -i password
+## Demo 1 - The basics
 
+./vault status
+./vault seal
+./vault status
+./vault unseal xxx
+
+./vault token-lookup
 ./vault write secret/myapp/data awesome="sauce"
 ./vault write secret/otherapp/data animal="pandas" color="black & white"  status="awesome"
 ./vault read secret/otherapp/data
 ./vault read -format json secret/otherapp/data
 cat docker_vault/myapp.hcl
-./vault token-create -format=json -display-name=myapp -policy=myapp -wrap-ttl=120
-./vault unwrap xx
-./vault auth
+./vault token-create -format=json -display-name=myapp -policy=myapp
+./vault auth #myapp-token
+./vault token-lookup
 ./vault read secret/otherapp/data
 ./vault read secret/myapp/data
 ./vault write secret/myapp/moredata this="better not work"
-./vault status
 
-./vault auth back to root
+## Demo 2 - Secure introduction
+
+docker exec secureintroductiondemo_mysql_1 env | grep -i password
+
+./vault auth #root-token
+./vault token-lookup
+./vault token-create -format=json -display-name=myapp -policy=myapp -wrap-ttl=120    #EXECUTED BY TRUSTED BROKER
+** shell 2
+./vault unwrap xx
+./vault auth #app-token
+./vault read secret/otherapp/data
+./vault read secret/myapp/data
+
+## Demo 3 - Mysql creds
+
+./vault auth #root-token
 ./vault list /mysql/roles
+cat ./initialize_vault
+mysql -u root -prootpassword -h 127.0.0.1 -e "SELECT User FROM mysql.user; show processlist;"
+./vault token-create -format=json -display-name=myapp -policy=myapp
+./vault auth #app-token
 ./vault read mysql/creds/readonly
-mysql -u root -prootpassword -h 127.0.0.1 -e "SELECT User FROM mysql.user"
 mysql -u token-myap-419b7 -p959edba3-bcf2-111c-22ce-cd56b55eb48f -h 127.0.0.1
-./vault auth *root*
-./vault revoke xxx
-mysql -u root -prootpassword -h 127.0.0.1 -e "SELECT User FROM mysql.user"
-mysql -u root -prootpassword -h 127.0.0.1 -e "SHOW PROCESSLIST"
+** shell 2
+./vault renew #mysql_creds
+./vault revoke #mysql_creds #permission denied (refer to mitm & hcl)
 
+./vault revoke #app_token
+curl -H "X-Vault-Token: f3b09679-3001-009d-2b80-9c306ab81aa6" -X POST  http://127.0.0.1:8200/v1/auth/token/revoke-self
+#./vault revoke #app_token
+mysql -u root -prootpassword -h 127.0.0.1 -e "SELECT User FROM mysql.user; show processlist;"
+
+** Shell 1
+exit mysql
+attempt to login
+review processlist
 
 sudo less docker_vault/logs/audit.log
 
+## Demo 4 - Putting it all together
 
-
+./vault auth #root
+rvm use ruby-2.3.0
 cd simple-service
 
 cd .. && WRAPPED_TOKEN=`./vault token-create -format=json -display-name=myapp -policy=myapp -wrap-ttl=10 | jq -c . | sed -e '#\n##'` && cd -

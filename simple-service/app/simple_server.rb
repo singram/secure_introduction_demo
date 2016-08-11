@@ -13,6 +13,11 @@ Vault.address = "http://127.0.0.1:8201" # Also reads from ENV["VAULT_ADDR"]
 # Secure Introduction of application
 #===================================
 
+unless ENV["VAULT_SI_TOKEN"]
+  puts "ERROR!! No wrapped secure introduction token supplied in VAULT_SI_TOKEN"
+  exit
+end
+
 wrapper_token = Vault::WrapInfo.new(JSON.parse(ENV["VAULT_SI_TOKEN"], symbolize_names: true)[:wrap_info] )
 
 puts "Initial secure introduction token is '#{wrapper_token.token}'"
