@@ -81,6 +81,22 @@ Shell 3
     ./vault list /mysql/roles
     ./vault read mysql/creds/readonly
 
+Example application
+
+    cd simple-service
+    cd .. && WRAPPED_TOKEN=`./vault token-create -format=json -display-name=myapp -policy=myapp -wrap-ttl=120 | jq -c . | sed -e '#\n##'` && cd -
+    echo $WRAPPED_TOKEN
+    VAULT_SI_TOKEN=$WRAPPED_TOKEN bundle exec ruby app/simple_server.rb
+
+To renew keys
+
+    curl localhost:4567/renew
+
+To rotate keys
+
+    curl localhost:4567/rotate
+
+
 ## References
 
 ### Quote source
